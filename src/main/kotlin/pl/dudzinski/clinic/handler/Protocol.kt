@@ -10,6 +10,16 @@ data class PatientDTO(
     constructor(name: String, surname: String, address: List<AddressDTO>?) : this(null, name, surname, address)
 }
 
+data class DoctorDTO(
+        var id: Long?,
+        var name: String?,
+        var surname: String?,
+        var specialization : String?
+) {
+    constructor() : this(null, null, null,null)
+    constructor(name: String, surname: String, specialization: String) : this(null, name, surname, specialization)
+}
+
 data class AddressDTO(
         var id: Long?,
         var city: String?,

@@ -11,8 +11,7 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/patients")
-class PatientController(val protocolMapper: ProtocolMapper,
-                        val patientService: PatientService,
+class PatientController(val patientService: PatientService,
                         @Value("\${server.servlet.context-path}")
                         val contextPath: String) {
 

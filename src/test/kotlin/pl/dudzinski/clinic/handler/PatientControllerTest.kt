@@ -67,7 +67,7 @@ internal class PatientControllerTest : AbstractSpringIntegrationTest() {
 
         val responseEntityAfterDelete = invoker.getAllPatients()
         assertEquals(HttpStatus.OK, responseEntityAfterDelete.statusCode)
-        assertEquals(0, invoker.getAllPatients().body?.size)
+        assertEquals(0, responseEntityAfterDelete.body?.size)
     }
 
     @Test
@@ -79,14 +79,14 @@ internal class PatientControllerTest : AbstractSpringIntegrationTest() {
 
         val savedPatientEntityResponse =
                 invoker.get(resourceURI, PatientDTO::class.java)
-        assertEquals(HttpStatus.OK, savedPatientEntityResponse?.statusCode)
+        assertEquals(HttpStatus.OK, savedPatientEntityResponse.statusCode)
 
         val patient = savedPatientEntityResponse.body
         invoker.updatePatient(patient?.id!!, PatientDTO("Marek","Dobrzycki",null))
 
         val updatedPatientEntiyResponse =
                 invoker.get(resourceURI, PatientDTO::class.java)
-        assertEquals(HttpStatus.OK, updatedPatientEntiyResponse?.statusCode)
+        assertEquals(HttpStatus.OK, updatedPatientEntiyResponse.statusCode)
         val updatedPatient = updatedPatientEntiyResponse.body
 
         assertEquals("Marek",updatedPatient?.name)

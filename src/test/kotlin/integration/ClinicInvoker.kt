@@ -5,9 +5,21 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
+import pl.dudzinski.clinic.handler.DoctorDTO
 import pl.dudzinski.clinic.handler.PatientDTO
 
 class ClinicInvoker(private val restTemplate: RestTemplate) {
+
+    fun getAllDoctors(): ResponseEntity<Array<DoctorDTO>> {
+        return get("/doctors/", responseType = Array<DoctorDTO>::class.java)
+    }
+
+    fun deleteDoctor(id : Long) = delete("/doctors/${id}")
+
+    fun updateDoctor(id : Long, doctorDTO: DoctorDTO) = put("/doctors/${id}", doctorDTO)
+
+    fun saveDoctor(doctorDTO: DoctorDTO) = post("/doctors", doctorDTO, DoctorDTO::class.java)
+
 
     fun getAllPatients(): ResponseEntity<Array<PatientDTO>> {
         return get("/patients/", responseType = Array<PatientDTO>::class.java)
@@ -15,7 +27,7 @@ class ClinicInvoker(private val restTemplate: RestTemplate) {
 
     fun getPatient(id: Long): ResponseEntity<PatientDTO> = get("/patients/${id}", PatientDTO::class.java)
 
-    fun savePatient(patientDTO: PatientDTO) = post("/patients", patientDTO, PatientDTO::class.java)
+    fun savePatient(patientDTO: PatientDTO) = post("/patients", patientDTO, Unit::class.java)
 
     fun deletePatient(id : Long) = delete("/patients/${id}")
 
