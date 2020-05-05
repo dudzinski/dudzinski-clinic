@@ -4,7 +4,14 @@ import javax.persistence.*
 
 @Entity
 class Patient(
-        @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = [CascadeType.ALL])
+        name : String,
+        surname : String,
+
+        @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
         @JoinColumn(name = "patient_id")
-        var address: List<Address>? = emptyList()
-) : Person(null, null, null)
+        var appointments: List<Appointment>?,
+
+        @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = [CascadeType.ALL])
+        @JoinColumn(name = "patient_id") var address: List<Address>?
+
+) : Person(null, name, surname)

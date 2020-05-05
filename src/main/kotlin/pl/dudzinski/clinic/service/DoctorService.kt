@@ -5,7 +5,7 @@ import java.util.*
 
 interface DoctorService {
     fun saveDoctor(doctorDTO: DoctorDTO): DoctorDTO
-    fun getDoctor(id: Long): Optional<DoctorDTO>
+    fun getDoctor(id: Long): DoctorDTO
     fun getAllDoctors(): List<DoctorDTO>
     fun deleteDoctor(id: Long)
     fun updateDoctor(id: Long, doctorDTO: DoctorDTO)

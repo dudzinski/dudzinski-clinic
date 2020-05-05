@@ -1,75 +1,91 @@
 package pl.dudzinski.clinic.handler
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import pl.dudzinski.clinic.AbstractSpringIntegrationTest
+import pl.dudzinski.clinic.assertDoctor
+import pl.dudzinski.clinic.assertDoctors
 
 internal class DoctorControllerTest : AbstractSpringIntegrationTest() {
 
     @Test
-    fun `save new doctor without address`() {
-        val doctorDTO = DoctorDTO("Tomasz", "Barańczuk","Dentysta")
+    fun `get doctor which is not exist`() {
+        assertResourceNotFound { invoker.getDoctor(33L) }
+    }
 
-        val responseEntity = invoker.saveDoctor(doctorDTO)
+    @Test
+    fun `delete doctor which is not exist`() {
+        assertResourceNotFound { invoker.deleteDoctor(33L) }
+    }
+
+    @Test
+    fun `update doctor which is not exist`() {
+        val doctor = DoctorDTO("Franek", "Barańczuk", "Dermatolog")
+        assertEquals(HttpStatus.CREATED, invoker.updateDoctor(33L, doctor)?.statusCode)
+    }
+
+    @Test
+    fun `save new doctor and get him by id`() {
+        val doctor = DoctorDTO("Tomasz", "Barańczuk", "Dentysta")
+
+        val responseEntity = invoker.saveDoctor(doctor)
         assertEquals(HttpStatus.CREATED, responseEntity!!.statusCode)
+
+        val resourceURI = hostWithPort + responseEntity.headers.location.toString()
+        val savedDoctorEntityResponse = invoker.get(resourceURI, DoctorDTO::class.java)
+        assertDoctor(doctor, savedDoctorEntityResponse.body)
     }
 
     @Test
     fun `save three doctors and get them all`() {
-        assertEquals(HttpStatus.CREATED, invoker.saveDoctor(DoctorDTO("Bronisław", "Włodarski", "Chirurg"))!!.statusCode)
-        assertEquals(HttpStatus.CREATED, invoker.saveDoctor(DoctorDTO("Waldemar", "Dudkiewicz", "Kardiolog"))!!.statusCode)
-        assertEquals(HttpStatus.CREATED, invoker.saveDoctor(DoctorDTO("Tomasz", "Barańczuk", "Dentysta"))!!.statusCode)
+        val doctors = listOf(
+                DoctorDTO("Bronisław", "Włodarski", "Chirurg"),
+                DoctorDTO("Waldemar", "Dudkiewicz", "Kardiolog"),
+                DoctorDTO("Tomasz", "Barańczuk", "Dentysta")
+        )
+        doctors.forEach { assertEquals(HttpStatus.CREATED, invoker.saveDoctor(it)!!.statusCode) }
 
         val responseEntity = invoker.getAllDoctors()
         assertEquals(HttpStatus.OK, responseEntity.statusCode)
-
-        val allDoctors = responseEntity.body
-        assertNotNull(allDoctors)
-        assertEquals(3, allDoctors?.size)
+        assertDoctors(doctors, responseEntity.body?.toList())
     }
 
     @Test
     fun `save one doctor and delete him`() {
-        val responseEntity = invoker.saveDoctor(DoctorDTO("Bronisław", "Włodarski", "Chirurg"))
-        assertEquals(HttpStatus.CREATED, responseEntity?.statusCode)
+        val doctor = DoctorDTO("Tomasz", "Barańczuk", "Dentysta")
 
-        val responseEntityBeforeDelete = invoker.getAllDoctors()
-        assertEquals(HttpStatus.OK, responseEntityBeforeDelete.statusCode)
-        val allDoctorsBeforeDelete = invoker.getAllDoctors().body
-        assertEquals(1, allDoctorsBeforeDelete?.size)
+        val responseEntity = invoker.saveDoctor(doctor)
+        assertEquals(HttpStatus.CREATED, responseEntity!!.statusCode)
 
-        val deleteDoctorResponseEntity = invoker.deleteDoctor(allDoctorsBeforeDelete?.first()?.id!!)
+        val resourceURI = hostWithPort + responseEntity.headers.location.toString()
+        val getDoctorEntityResponse = invoker.get(resourceURI, DoctorDTO::class.java)
+        assertDoctor(doctor, getDoctorEntityResponse.body)
+
+        val doctorId = getDoctorEntityResponse.body?.id!!
+        val deleteDoctorResponseEntity = invoker.deleteDoctor(doctorId)
+
         assertEquals(HttpStatus.OK, deleteDoctorResponseEntity.statusCode)
-
-        val responseEntityAfterDelete = invoker.getAllDoctors()
-        assertEquals(HttpStatus.OK, responseEntityAfterDelete.statusCode)
-        assertEquals(0, responseEntityAfterDelete.body?.size)
+        assertResourceNotFound { invoker.getDoctor(doctorId) }
     }
 
     @Test
     fun `save one doctor and update him`() {
-        val responseEntity = invoker.saveDoctor(DoctorDTO("Bronisław", "Włodarski", "Chirurg"))
-        assertEquals(HttpStatus.CREATED, responseEntity?.statusCode)
+        val doctor = DoctorDTO("Tomasz", "Barańczuk", "Dentysta")
+        val responseEntity = invoker.saveDoctor(doctor)
+        assertEquals(HttpStatus.CREATED, responseEntity!!.statusCode)
 
-        val resourceURI = hostWithPort + responseEntity?.headers?.location.toString();
+        val resourceURI = hostWithPort + responseEntity.headers.location.toString()
+        val getDoctorEntityResponse = invoker.get(resourceURI, DoctorDTO::class.java)
+        assertDoctor(doctor, getDoctorEntityResponse.body)
 
-        val savedDoctorEntityResponse =
-                invoker.get(resourceURI, DoctorDTO::class.java)
-        assertEquals(HttpStatus.OK, savedDoctorEntityResponse.statusCode)
+        val doctorId = getDoctorEntityResponse.body?.id!!
+        val doctorWithNewData = DoctorDTO("Marek", "Dobrzycki", "Ortodonta")
+        invoker.updateDoctor(doctorId, doctorWithNewData)
 
-        val doctor = savedDoctorEntityResponse.body
-        invoker.updateDoctor(doctor?.id!!, DoctorDTO("Marek","Dobrzycki","Ortodonta"))
-
-        val updatedDoctorEntiyResponse =
-                invoker.get(resourceURI, DoctorDTO::class.java)
-        assertEquals(HttpStatus.OK, updatedDoctorEntiyResponse.statusCode)
-        val updatedDoctor = updatedDoctorEntiyResponse.body
-
-        assertEquals("Marek",updatedDoctor?.name)
-        assertEquals("Dobrzycki",updatedDoctor?.surname)
-        assertEquals("Ortodonta",updatedDoctor?.specialization)
+        val updateDoctorEntityResponse = invoker.get(resourceURI, DoctorDTO::class.java)
+        assertEquals(HttpStatus.OK, updateDoctorEntityResponse.statusCode)
+        assertDoctor(doctorWithNewData, updateDoctorEntityResponse.body)
     }
 }
 

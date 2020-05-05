@@ -1,40 +1,44 @@
 package pl.dudzinski.clinic.service
 
-import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import pl.dudzinski.clinic.handler.PatientDTO
-import pl.dudzinski.clinic.handler.ProtocolMapper
+import pl.dudzinski.clinic.handler.toPatient
+import pl.dudzinski.clinic.handler.toPatientDTO
+import pl.dudzinski.clinic.model.Patient
 import pl.dudzinski.clinic.respositories.PatientRepository
-import java.util.*
 
 @Service
 @Transactional
-class DefaultPatientService(private val patientRepository: PatientRepository,
-                            private val protocolMapper: ProtocolMapper) : PatientService {
+class DefaultPatientService(private val patientRepository: PatientRepository) : PatientService {
 
     override fun savePatient(patientDTO: PatientDTO): PatientDTO {
-        val patient = patientRepository.save(protocolMapper.toPatient(patientDTO))
-        return protocolMapper.toPatientDTO(patient)
+        return patientRepository.save(patientDTO.toPatient()).toPatientDTO()
     }
 
-    override fun getPatient(id: Long): Optional<PatientDTO> {
-        val patient = patientRepository.findByIdOrNull(id)
-        return if (patient != null) Optional.of(protocolMapper.toPatientDTO(patient)) else Optional.empty()
+    override fun getPatient(id: Long): PatientDTO {
+        return patientRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find patient with id: $id")
+        }.toPatientDTO()
     }
 
-    override fun getAllPatients(): List<PatientDTO> = patientRepository.findAll().map { protocolMapper.toPatientDTO(it) }
+    override fun getAllPatients(): List<PatientDTO> = patientRepository.findAll().map(Patient::toPatientDTO)
 
     override fun deletePatient(id: Long) {
-        patientRepository.deleteById(id)
+        val appointment = patientRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find patient with id: $id")
+        }
+        patientRepository.delete(appointment)
     }
 
     override fun updatePatient(id: Long, patientDTO: PatientDTO) {
-        val optionalPatient = patientRepository.findById(id)
-        optionalPatient.ifPresent {
-            it.name = patientDTO.name
-            it.surname = patientDTO.surname
+        val patient = patientRepository.findById(id).orElseThrow {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find patient with id: $id")
         }
+        patient.name = patientDTO.name
+        patient.surname = patientDTO.surname
     }
 
     override fun existPatient(id: Long): Boolean = patientRepository.existsById(id)

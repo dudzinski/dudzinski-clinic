@@ -5,7 +5,7 @@ import java.util.*
 
 interface PatientService {
     fun savePatient(patientDTO: PatientDTO): PatientDTO
-    fun getPatient(id: Long): Optional<PatientDTO>
+    fun getPatient(id: Long): PatientDTO
     fun getAllPatients(): List<PatientDTO>
     fun deletePatient(id: Long)
     fun updatePatient(id: Long, patientDTO: PatientDTO)

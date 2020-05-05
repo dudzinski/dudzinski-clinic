@@ -4,15 +4,15 @@ import javax.persistence.*
 
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @MappedSuperclass
-open class Person(
+abstract class Person(
 
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         val id: Long?,
 
         @Column(nullable = false)
-        var name: String?,
+        var name: String,
 
         @Column(nullable = false)
-        var surname: String?
+        var surname: String
 )
