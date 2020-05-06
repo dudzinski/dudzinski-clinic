@@ -3,11 +3,8 @@ package pl.dudzinski.clinic.handler
 import com.github.fge.jsonpatch.JsonPatch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.rest.webmvc.ResourceNotFoundException
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import pl.dudzinski.clinic.service.AppointmentService
 import pl.dudzinski.clinic.service.PatientService
 import java.net.URI

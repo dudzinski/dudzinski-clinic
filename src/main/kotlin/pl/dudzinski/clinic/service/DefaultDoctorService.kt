@@ -10,12 +10,14 @@ import pl.dudzinski.clinic.handler.toDoctor
 import pl.dudzinski.clinic.handler.toDoctorDTO
 import pl.dudzinski.clinic.handler.toPatientDTO
 import pl.dudzinski.clinic.model.Doctor
+import pl.dudzinski.clinic.respositories.AppointmentRepository
 import pl.dudzinski.clinic.respositories.DoctorRepository
 import java.util.*
 
 @Service
 @Transactional
-class DefaultDoctorService(private val doctorRepository: DoctorRepository) : DoctorService {
+class DefaultDoctorService(private val appointmentRepository: AppointmentRepository,
+                           private val doctorRepository: DoctorRepository) : DoctorService {
 
     override fun saveDoctor(doctorDTO: DoctorDTO): DoctorDTO {
         return doctorRepository.save(doctorDTO.toDoctor()).toDoctorDTO()
@@ -33,6 +35,7 @@ class DefaultDoctorService(private val doctorRepository: DoctorRepository) : Doc
         val doctor = doctorRepository.findById(id).orElseThrow {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find doctor with id: $id")
         }
+        appointmentRepository.deleteAll(doctor.appointments)
         doctorRepository.delete(doctor)
     }
 

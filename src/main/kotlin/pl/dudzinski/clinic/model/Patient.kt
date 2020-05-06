@@ -7,11 +7,11 @@ class Patient(
         name : String,
         surname : String,
 
-        @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+        @OneToMany(fetch = FetchType.LAZY)
         @JoinColumn(name = "patient_id")
-        var appointments: List<Appointment>?,
+        var appointments: List<Appointment> = emptyList(),
 
-        @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = [CascadeType.ALL])
-        @JoinColumn(name = "patient_id") var address: List<Address>?
+        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+        var address: Address?
 
 ) : Person(null, name, surname)

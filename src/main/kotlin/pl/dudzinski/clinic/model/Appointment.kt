@@ -19,8 +19,11 @@ class Appointment(
         @JsonIgnore
         val doctor: Doctor,
 
+        @ManyToOne(fetch = FetchType.LAZY, optional = true)
+        val clinic: Clinic,
+
         @Column(nullable = false)
         var date: Date
 ) {
-    constructor(patient: Patient, doctor: Doctor, date: Date) : this(null, patient, doctor, date)
+    constructor(patient: Patient, doctor: Doctor, clinic: Clinic, date: Date) : this(null, patient, doctor, clinic, date)
 }

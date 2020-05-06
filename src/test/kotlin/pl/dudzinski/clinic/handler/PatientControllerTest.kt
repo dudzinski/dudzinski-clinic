@@ -33,11 +33,10 @@ internal class PatientControllerTest : AbstractSpringIntegrationTest() {
     }
 
     @Test
-    fun `save new patient with two addresses and get him`() {
+    fun `save new patient with address and get him`() {
         val patient = PatientDTO("Franek", "Kowalski",
-                listOf(AddressDTO("Poznań", "67-798", "oś Jana Sobieskiego", "16E/122"),
-                        AddressDTO("Białogard", "78-200", "Nowowiejskiego", "3A/2"))
-        )
+                AddressDTO("Poznań", "67-798", "oś Jana Sobieskiego", "16E/122"))
+
         assertEquals(HttpStatus.CREATED, invoker.savePatient(patient)!!.statusCode)
         val responseEntity = invoker.getAllPatients()
         assertEquals(HttpStatus.OK, responseEntity.statusCode)

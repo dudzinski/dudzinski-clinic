@@ -9,14 +9,12 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 @SpringBootTest(
         classes = [ClinicApplication::class],
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = ["classpath:application-integration-test.properties"])
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 abstract class AbstractSpringIntegrationTest {
 

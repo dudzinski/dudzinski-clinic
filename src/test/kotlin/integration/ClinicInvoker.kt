@@ -3,10 +3,25 @@ package integration
 import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
 import pl.dudzinski.clinic.handler.AppointmentDTO
+import pl.dudzinski.clinic.handler.ClinicDTO
 import pl.dudzinski.clinic.handler.DoctorDTO
 import pl.dudzinski.clinic.handler.PatientDTO
 
 class ClinicInvoker(private val restTemplate: RestTemplate) {
+
+
+    fun getAllClinics(): ResponseEntity<Array<ClinicDTO>> {
+        return get("/clinics/", responseType = Array<ClinicDTO>::class.java)
+    }
+
+    fun getClinic(id: Long): ResponseEntity<ClinicDTO> = get("/clinics/${id}", ClinicDTO::class.java)
+
+    fun deleteClinic(id: Long) = delete("/clinics/${id}")
+
+    fun updateClinic(id: Long, clinicDTO: ClinicDTO) = put("/clinics/${id}", clinicDTO, Unit::class.java)
+
+    fun saveClinic(clinicDTO: ClinicDTO) = post("/clinics", clinicDTO, Unit::class.java)
+
 
     fun getAllAppointmentsForPatient(id: Long): ResponseEntity<Array<AppointmentDTO>> {
         return get("/patients/${id}/appointments", responseType = Array<AppointmentDTO>::class.java)

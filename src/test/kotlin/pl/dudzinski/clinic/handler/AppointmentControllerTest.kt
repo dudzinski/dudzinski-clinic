@@ -23,6 +23,9 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
 
         assertEquals(HttpStatus.CREATED, invoker.savePatient(PatientDTO("Franek", "Kowalski", null))!!.statusCode)
         assertEquals(HttpStatus.CREATED, invoker.savePatient(PatientDTO("Piotr", "Dudziński", null))!!.statusCode)
+
+        assertEquals(HttpStatus.CREATED, invoker.saveClinic(ClinicDTO("Medical Magnus Clinic",
+                AddressDTO("Łódź", "90-552", "Kopernika", "38")))!!.statusCode)
     }
 
     @Test
@@ -39,8 +42,9 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     fun `update appointment which is not exist`() {
         val patient = invoker.getAllPatients().body?.first()!!
         val doctor = invoker.getAllDoctors().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
 
-        val appointment = AppointmentDTO(33L,patient, doctor, DateTime.now().millis)
+        val appointment = AppointmentDTO(33L, patient, doctor, clinic, DateTime.now().millis)
         assertEquals(HttpStatus.CREATED, invoker.updateAppointment(33L, appointment)?.statusCode)
     }
 
@@ -49,8 +53,9 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     fun `save new appointment`() {
         val patient = invoker.getAllPatients().body?.first()!!
         val doctor = invoker.getAllDoctors().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
 
-        val appointment = AppointmentDTO(patient, doctor, Date())
+        val appointment = AppointmentDTO(patient, doctor, clinic, Date())
         assertEquals(HttpStatus.CREATED, invoker.saveAppointment(appointment)!!.statusCode)
 
         val appointments = invoker.getAllAppointments().body
@@ -64,8 +69,9 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     fun `save new appointment and patch date`() {
         val patient = invoker.getAllPatients().body?.first()!!
         val doctor = invoker.getAllDoctors().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
 
-        val appointment = AppointmentDTO(patient, doctor, Date())
+        val appointment = AppointmentDTO(patient, doctor, clinic, Date())
         assertEquals(HttpStatus.CREATED, invoker.saveAppointment(appointment)!!.statusCode)
 
         val savedAppointment = invoker.getAllAppointments().body?.first()
@@ -82,12 +88,13 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     @Test
     fun `save a few appointments and get them all`() {
         val patient = invoker.getAllPatients().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
         val doctors = invoker.getAllDoctors().body
         val iterator = doctors?.iterator()
 
         val appointments = listOf(
-                AppointmentDTO(patient, iterator?.next()!!, Date()),
-                AppointmentDTO(patient, iterator.next(), now().plus(Period().withDays(10)).toDate())
+                AppointmentDTO(patient, iterator?.next()!!, clinic, Date()),
+                AppointmentDTO(patient, iterator.next(), clinic, now().plus(Period().withDays(10)).toDate())
         )
         appointments.forEach {
             assertEquals(HttpStatus.CREATED, invoker.saveAppointment(it)!!.statusCode)
@@ -102,8 +109,9 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     fun `save new appointment and delete it`() {
         val patient = invoker.getAllPatients().body?.first()!!
         val doctor = invoker.getAllDoctors().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
 
-        val appointment = AppointmentDTO(patient, doctor, Date())
+        val appointment = AppointmentDTO(patient, doctor, clinic, Date())
         val responseEntity = invoker.saveAppointment(appointment)
         assertEquals(HttpStatus.CREATED, responseEntity!!.statusCode)
 
@@ -121,13 +129,14 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
     @Test
     fun `save a few appointments for one patient get them all`() {
         val patient = invoker.getAllPatients().body?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
         val doctors = invoker.getAllDoctors().body
         val doctorsIterator = doctors?.iterator()
 
         val appointments = listOf(
-                AppointmentDTO(patient, doctorsIterator?.next()!!, Date()),
-                AppointmentDTO(patient, doctorsIterator.next(), now().plus(Period().withDays(10)).toDate()),
-                AppointmentDTO(patient, doctorsIterator.next(), now().plus(Period().withDays(16)).toDate())
+                AppointmentDTO(patient, doctorsIterator?.next()!!, clinic, Date()),
+                AppointmentDTO(patient, doctorsIterator.next(), clinic, now().plus(Period().withDays(10)).toDate()),
+                AppointmentDTO(patient, doctorsIterator.next(), clinic, now().plus(Period().withDays(16)).toDate())
 
         )
 
@@ -139,4 +148,47 @@ internal class AppointmentControllerTest : AbstractSpringIntegrationTest() {
         assertEquals(HttpStatus.OK, getAllAppointmentsResponseEntity.statusCode)
         assertAppointments(appointments, getAllAppointmentsResponseEntity.body?.toList()!!)
     }
+
+    @Test
+    fun `save new appointment and delete patient`() {
+        val allPatients = invoker.getAllPatients().body
+        val patient = allPatients?.first()!!
+        val allDoctors = invoker.getAllDoctors().body
+        val doctor = allDoctors?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
+
+        val appointment = AppointmentDTO(patient, doctor, clinic, Date())
+        assertEquals(HttpStatus.CREATED, invoker.saveAppointment(appointment)!!.statusCode)
+
+        val appointments = invoker.getAllAppointments().body
+        assertAppointments(listOf(appointment), appointments?.toList())
+
+        assertEquals(HttpStatus.OK, invoker.deletePatient(patient.id!!).statusCode)
+        val appointmentsAfterDelete = invoker.getAllAppointments().body
+        assertEquals(0, appointmentsAfterDelete?.size)
+        assertEquals(allPatients.size - 1, invoker.getAllPatients().body?.size)
+        assertEquals(allDoctors.size, invoker.getAllDoctors().body?.size)
+    }
+
+    @Test
+    fun `save new appointment and delete doctor`() {
+        val allPatients = invoker.getAllPatients().body
+        val patient = allPatients?.first()!!
+        val allDoctors = invoker.getAllDoctors().body
+        val doctor = allDoctors?.first()!!
+        val clinic = invoker.getAllClinics().body?.first()!!
+
+        val appointment = AppointmentDTO(patient, doctor, clinic, Date())
+        assertEquals(HttpStatus.CREATED, invoker.saveAppointment(appointment)!!.statusCode)
+
+        val appointments = invoker.getAllAppointments().body
+        assertAppointments(listOf(appointment), appointments?.toList())
+
+        assertEquals(HttpStatus.OK, invoker.deleteDoctor(doctor.id!!).statusCode)
+        val appointmentsAfterDelete = invoker.getAllAppointments().body
+        assertEquals(0, appointmentsAfterDelete?.size)
+        assertEquals(allDoctors.size - 1, invoker.getAllDoctors().body?.size)
+        assertEquals(allPatients.size, invoker.getAllPatients().body?.size)
+    }
+
 }

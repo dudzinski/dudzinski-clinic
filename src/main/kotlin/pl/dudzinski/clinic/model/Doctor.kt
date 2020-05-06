@@ -1,9 +1,6 @@
 package pl.dudzinski.clinic.model
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
+import javax.persistence.*
 
 @Entity
 class Doctor(
@@ -14,8 +11,8 @@ class Doctor(
         @Column(nullable = false)
         var specialization: String,
 
-        @OneToMany
+        @OneToMany(fetch = FetchType.LAZY)
         @JoinColumn(name = "doctor_id")
-        var appointments: List<Appointment>?
+        var appointments: List<Appointment> = emptyList()
 
 ) : Person(null, name, surname)

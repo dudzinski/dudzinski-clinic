@@ -4,14 +4,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.dudzinski.clinic.service.AppointmentService
+import pl.dudzinski.clinic.service.DefaultAppointmentService
 import pl.dudzinski.clinic.service.PatientService
 import java.net.URI
 
 @RestController
 @RequestMapping("/patients")
 class PatientController(val patientService: PatientService,
-                        val appointmentService: AppointmentService,
+                        val appointmentService: DefaultAppointmentService,
                         @Value("\${server.servlet.context-path}")
                         val contextPath: String) {
 

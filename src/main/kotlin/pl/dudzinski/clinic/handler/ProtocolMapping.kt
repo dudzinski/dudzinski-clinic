@@ -1,21 +1,18 @@
 package pl.dudzinski.clinic.handler
 
-import pl.dudzinski.clinic.model.Address
-import pl.dudzinski.clinic.model.Appointment
-import pl.dudzinski.clinic.model.Doctor
-import pl.dudzinski.clinic.model.Patient
+import pl.dudzinski.clinic.model.*
 import java.util.*
 
 fun AppointmentDTO.toAppointment(): Appointment {
-    return Appointment(patient.toPatient(), doctor.toDoctor(), Date(date))
+    return Appointment(patient.toPatient(), doctor.toDoctor(), clinic.toClinic(), Date(date))
 }
 
 fun Appointment.toAppointmentDTO(): AppointmentDTO {
-    return AppointmentDTO(id, patient.toPatientDTO(), doctor.toDoctorDTO(), date.time)
+    return AppointmentDTO(id, patient.toPatientDTO(), doctor.toDoctorDTO(), clinic.toClinicDTO(), date.time)
 }
 
 fun DoctorDTO.toDoctor(): Doctor {
-    return Doctor(name, surname, specialization, null)
+    return Doctor(name, surname, specialization, emptyList())
 }
 
 fun Doctor.toDoctorDTO(): DoctorDTO {
@@ -23,11 +20,11 @@ fun Doctor.toDoctorDTO(): DoctorDTO {
 }
 
 fun PatientDTO.toPatient(): Patient {
-    return Patient(name, surname, null, addresses?.map { it.toAddress() })
+    return Patient(name, surname, emptyList(), address?.toAddress())
 }
 
 fun Patient.toPatientDTO(): PatientDTO {
-    return PatientDTO(id, name, surname, address?.map(Address::toAddressDTO))
+    return PatientDTO(id, name, surname, address?.toAddressDTO())
 }
 
 fun AddressDTO.toAddress(): Address {
@@ -36,4 +33,12 @@ fun AddressDTO.toAddress(): Address {
 
 fun Address.toAddressDTO(): AddressDTO {
     return AddressDTO(id, city, postcode, street, houseNo)
+}
+
+fun Clinic.toClinicDTO(): ClinicDTO {
+    return ClinicDTO(id, name, address?.toAddressDTO())
+}
+
+fun ClinicDTO.toClinic(): Clinic {
+    return Clinic(id, name, address?.toAddress())
 }

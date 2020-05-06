@@ -2,10 +2,23 @@ package pl.dudzinski.clinic
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import pl.dudzinski.clinic.handler.AddressDTO
-import pl.dudzinski.clinic.handler.AppointmentDTO
-import pl.dudzinski.clinic.handler.DoctorDTO
-import pl.dudzinski.clinic.handler.PatientDTO
+import pl.dudzinski.clinic.handler.*
+
+fun assertClinics(expectedClinics: List<ClinicDTO>?, actualClinics: List<ClinicDTO>?) {
+    assertTrue(bothNullOrNotNull(expectedClinics, actualClinics))
+    assertEquals(expectedClinics!!.size, actualClinics!!.size)
+    val expectedIterator = expectedClinics.iterator()
+    val actualIterator = actualClinics.iterator()
+    while (expectedIterator.hasNext()) {
+        assertClinic(expectedIterator.next(), actualIterator.next())
+    }
+}
+
+fun assertClinic(expected: ClinicDTO?, actual: ClinicDTO?) {
+    assertTrue(bothNullOrNotNull(expected, actual))
+    assertEquals(expected!!.name, actual!!.name)
+    assertAddress(expected.address, actual.address)
+}
 
 fun assertAppointments(expectedAppointments: List<AppointmentDTO>?, actualAppointments: List<AppointmentDTO>?) {
     assertTrue(bothNullOrNotNull(expectedAppointments, actualAppointments))
@@ -55,27 +68,15 @@ fun assertPatient(expected: PatientDTO?, actual: PatientDTO?) {
     assertTrue(bothNullOrNotNull(expected, actual))
     assertEquals(expected!!.name, actual!!.name)
     assertEquals(expected.surname, actual.surname)
-    assertAddresses(expected.addresses, actual.addresses)
+    assertAddress(expected.address, actual.address)
 }
 
-fun assertAddresses(expectedAddresses: List<AddressDTO>?, actualAddresses: List<AddressDTO>?) {
-
-    assertTrue(bothNullOrNotNull(expectedAddresses, actualAddresses))
-    assertEquals(expectedAddresses!!.size, actualAddresses!!.size)
-    val expectedIterator = expectedAddresses.iterator()
-    val actualIterator = actualAddresses.iterator()
-    while (expectedIterator.hasNext()) {
-        assertAddress(expectedIterator.next(), actualIterator.next())
-    }
-}
-
-
-fun assertAddress(expected: AddressDTO, actual: AddressDTO) {
+fun assertAddress(expected: AddressDTO?, actual: AddressDTO?) {
     assertTrue(bothNullOrNotNull(expected, actual))
-    assertEquals(expected.city, actual.city)
-    assertEquals(expected.street, actual.street)
-    assertEquals(expected.postcode, actual.postcode)
-    assertEquals(expected.houseNo, actual.houseNo)
+    assertEquals(expected?.city, actual?.city)
+    assertEquals(expected?.street, actual?.street)
+    assertEquals(expected?.postcode, actual?.postcode)
+    assertEquals(expected?.houseNo, actual?.houseNo)
 }
 
 fun bothNullOrNotNull(first: Any?, second: Any?): Boolean {
