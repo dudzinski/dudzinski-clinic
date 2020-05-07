@@ -3,10 +3,17 @@ package pl.dudzinski.clinic.model
 import javax.persistence.*
 
 @Entity
-class Doctor(
+data class Doctor(
 
-        name: String,
-        surname: String,
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val id: Long?,
+
+        @Column(nullable = false)
+        var name: String,
+
+        @Column(nullable = false)
+        var surname: String,
 
         @Column(nullable = false)
         var specialization: String,
@@ -15,4 +22,7 @@ class Doctor(
         @JoinColumn(name = "doctor_id")
         var appointments: List<Appointment> = emptyList()
 
-) : Person(null, name, surname)
+) {
+    constructor(name: String, surname: String, specialization: String, appointments: List<Appointment>) :
+            this(null, name, surname, specialization, appointments)
+}

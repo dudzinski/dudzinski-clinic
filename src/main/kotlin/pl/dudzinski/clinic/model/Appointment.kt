@@ -5,7 +5,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-class Appointment(
+data class Appointment(
 
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
