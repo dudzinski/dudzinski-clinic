@@ -13,7 +13,9 @@ Application is standalone and if you want to run it you need just run from comma
 or if you use docker you can just run it as container using command line:
 <code>./run.sh</code>
 
-In the both options the rest api is available in the path http://localhost:8080/clinic/ e.g. if you want to add patient just invoke http post method with body:
+There is option to consume rest api via [Swagger](http://localhost:8080/clinic/swagger-ui.html#/).
+If you prefer other http consumers like Postman you need just to know root path: http://localhost:8080/clinic/ e.g.
+if you want to add patient just invoke http post method with body:
 <code>
 {
 	"name": "Piotr",

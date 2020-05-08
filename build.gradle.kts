@@ -13,7 +13,10 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    mavenCentral();
+    mavenCentral()
+    maven {
+        url = uri("http://oss.jfrog.org/artifactory/oss-snapshot-local")
+    }
 }
 
 dependencies {
@@ -28,6 +31,10 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("ch.qos.logback:logback-core:1.2.3")
+
+    implementation("io.springfox:springfox-swagger2:3.0.0-SNAPSHOT")
+    implementation("io.springfox:springfox-data-rest:3.0.0-SNAPSHOT")
+    implementation("io.springfox:springfox-swagger-ui:3.0.0-SNAPSHOT")
 
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
