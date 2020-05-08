@@ -2,9 +2,10 @@
 Clone repository and run project - it should start out of the box (if it doesn't let me know)
 
 ## Git methodology
+This project does **not** follow the _Gitflow_ methodology. There is no `develop` branch!
 I work with master and feature branches.
 
-I use fast-forward merges
+I prefer to use fast-forward merges
 
 Branches should be named like: feature/<short_description>
 
